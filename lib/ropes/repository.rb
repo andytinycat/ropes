@@ -83,7 +83,7 @@ module Ropes
           raise "Package metadata must be in hash format"
         end
       else
-        raise "Missing mandatory fields on package: #{validate_metadata(metadata).join(", ")}"
+        raise "Missing mandatory fields on package: #{validate_metadata(package).join(", ")}"
       end
     end
 
