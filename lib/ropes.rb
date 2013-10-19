@@ -1,5 +1,6 @@
 require "ropes/version"
+require "ropes/repository"
 
 module Ropes
-  # Your code goes here...
+  
 end
