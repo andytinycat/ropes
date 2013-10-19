@@ -3,6 +3,7 @@ require 'stringio'
 require 'zlib'
 require 'tempfile'
 require 'digest'
+require 'gpgme'
 
 module Ropes
 
@@ -144,6 +145,16 @@ module Ropes
       lines << " #{Digest::MD5.hexdigest(packages_file)}                   #{temp_packages_file.size} #{@options[:components]}/binary-#{@options[:architecture]}/Packages"
       lines << " #{Digest::MD5.hexdigest(packages_file_gz)}                   #{temp_packages_file_gz.size} #{@options[:components]}/binary-#{@options[:architecture]}/Packages.gz"
       lines.join("\n")
+    end
+
+    # Get detached GPG signature of Release file
+
+    def release_file_gpg(path_to_gpgkey)
+      GPGME::Key.import(File.open(path_to_gpgkey))
+      GPGME::Crypto.new.sign(release_file, {
+        :mode => GPGME::SIG_MODE_DETACH,
+        :armor => true
+      })
     end
 
     private
