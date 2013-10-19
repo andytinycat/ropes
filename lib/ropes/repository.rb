@@ -19,7 +19,7 @@ module Ropes
         type 
         distribution 
         version 
-        architecture 
+        architectures 
         components 
         description
         package_base}.reject do |required_option|
@@ -29,6 +29,7 @@ module Ropes
       raise "Missing options: #{missing_options.join(", ")}" unless missing_options.empty?
 
       raise InvalidRepositoryType, "Repository type #{options[:type]} is neither :apt or :yum" unless options[:type] == :yum or options[:type] == :apt
+      raise Error, "Architectures must be an array" unless options[:architectures].is_a? Array
 
       @release_file     = nil
       @packages_file     = nil
@@ -89,9 +90,9 @@ module Ropes
 
     # Get the Packages file as a string
 
-    def packages_file
-      return @packages_file unless @packages_file.nil?
-      entries = @packages.map do |package|
+    def packages_file(arch)
+      packages_for_arch = @packages.select {|p| p["architecture"] == arch}
+      entries = packages_for_arch.map do |package|
         lines = []
         @field_order.each do |field|
           if package[field] != nil
@@ -109,15 +110,19 @@ module Ropes
         end
         lines.join("\n")
       end
-      @packages_file = entries.join("\n\n") + "\n"
+      if entries.empty?
+        ""
+      else
+        entries.join("\n\n") + "\n"
+      end
     end
 
     # Get the Packages file as a gzip'ed string
 
-    def packages_file_gz
+    def packages_file_gz(arch)
       io = StringIO.new("w")
       gz = Zlib::GzipWriter.new(io)
-      gz.write(packages_file())
+      gz.write(packages_file(arch))
       gz.close
       io.string
     end
@@ -125,13 +130,6 @@ module Ropes
     # Get the Release file as a string
 
     def release_file 
-
-      # Have to create the files in real life to get the real size
-      temp_packages_file = Tempfile.new("Packages")
-      temp_packages_file.write packages_file
-      temp_packages_file_gz= Tempfile.new("Packages.gz")
-      temp_packages_file_gz.write packages_file_gz
-
       lines = []
       lines << "Origin: #{@options[:origin]}"
       lines << "Label: #{@options[:origin]}"
@@ -139,12 +137,19 @@ module Ropes
       lines << "Version: #{@options[:version]}"
       lines << "Codename: #{@options[:distribution]}"
       lines << "Date: #{Time.new.utc.strftime '%a, %d %b %Y %H:%M:%S UTC'}"
-      lines << "Architectures: #{@options[:architecture]}"
+      lines << "Architectures: #{@options[:architectures].join(" ")}"
       lines << "Components: #{@options[:components]}"
       lines << "Description: #{@options[:description]}"
       lines << "MD5Sum:"
-      lines << " #{Digest::MD5.hexdigest(packages_file)}                   #{temp_packages_file.size} #{@options[:components]}/binary-#{@options[:architecture]}/Packages"
-      lines << " #{Digest::MD5.hexdigest(packages_file_gz)}                   #{temp_packages_file_gz.size} #{@options[:components]}/binary-#{@options[:architecture]}/Packages.gz"
+      @options[:architectures].each do |arch|
+        # Have to create the files in real life to get the real size
+        temp_packages_file = Tempfile.new("Packages")
+        temp_packages_file.write packages_file(arch)
+        temp_packages_file_gz = Tempfile.new("Packages.gz")
+        temp_packages_file_gz.write packages_file_gz(arch)
+        lines << " #{Digest::MD5.hexdigest(packages_file(arch))}                   #{temp_packages_file.size} #{@options[:components]}/binary-#{arch}/Packages"
+        lines << " #{Digest::MD5.hexdigest(packages_file_gz(arch))}                   #{temp_packages_file_gz.size} #{@options[:components]}/binary-#{arch}/Packages.gz"
+      end
       lines.join("\n") + "\n"
     end
 
