@@ -76,7 +76,7 @@ module Ropes
     end
 
     def add_file_by_info(package)
-      if validate_metadata(packages).empty?
+      if validate_metadata(package).empty?
         if package.is_a? Hash
           @packages << package
         else
