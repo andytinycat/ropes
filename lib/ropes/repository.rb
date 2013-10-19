@@ -4,6 +4,7 @@ require 'zlib'
 require 'tempfile'
 require 'digest'
 require 'gpgme'
+require 'uuid'
 
 module Ropes
 
@@ -108,7 +109,7 @@ module Ropes
         end
         lines.join("\n")
       end
-      @packages_file = entries.join("\n\n")
+      @packages_file = entries.join("\n\n") + "\n"
     end
 
     # Get the Packages file as a gzip'ed string
@@ -144,7 +145,7 @@ module Ropes
       lines << "MD5Sum:"
       lines << " #{Digest::MD5.hexdigest(packages_file)}                   #{temp_packages_file.size} #{@options[:components]}/binary-#{@options[:architecture]}/Packages"
       lines << " #{Digest::MD5.hexdigest(packages_file_gz)}                   #{temp_packages_file_gz.size} #{@options[:components]}/binary-#{@options[:architecture]}/Packages.gz"
-      lines.join("\n")
+      lines.join("\n") + "\n"
     end
 
     # Get detached GPG signature of Release file
@@ -158,6 +159,7 @@ module Ropes
     end
 
     private
+
 
     def packages_line(field, value)
       "#{field}: #{value}"
