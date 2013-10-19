@@ -51,8 +51,14 @@ for you.
 
     repo.add_file_by_path("some_custom_package.deb")
 
+    # For amd64 files
     File.open("Packages", "w") do |file|
-      file.write repo.packages_file
+      file.write repo.packages_file("amd64")
+    end
+
+    # For i386
+    File.open("Packages", "w") do |file|
+      file.write repo.packages_file("i386")
     end
 
     File.open("Release", "w") do |file|
@@ -63,8 +69,14 @@ for you.
       file.write repo.release_file_gpg("/path/to/your/gpg.key")
     end
 
+    # For amd64
     File.open("Packages.gz", "w") do |file|
-      file.write repo.packages_file_gz
+      file.write repo.packages_file_gz("amd64")
+    end
+
+    # For i386
+    File.open("Packages.gz", "w") do |file|
+      file.write repo.packages_file_gz("amd64")
     end
 
 ## Contributing
