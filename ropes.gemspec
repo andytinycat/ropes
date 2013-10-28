@@ -23,4 +23,5 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "rake"
   spec.add_dependency "debeasy"
   spec.add_dependency "gpgme"
+  spec.add_dependency "arr-pm"
 end
