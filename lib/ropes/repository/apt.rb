@@ -12,7 +12,7 @@ module Ropes
   class InvalidRepositoryType < Error; end
 
   module Repository
-    class Debian
+    class Apt
     
       def initialize(options)
         missing_options = %w{
@@ -29,7 +29,6 @@ module Ropes
 
         raise "Missing options: #{missing_options.join(", ")}" unless missing_options.empty?
 
-        raise InvalidRepositoryType, "Repository type #{options[:type]} is neither :apt or :yum" unless options[:type] == :yum or options[:type] == :apt
         raise Error, "Architectures must be an array" unless options[:architectures].is_a? Array
 
         @release_file     = nil
