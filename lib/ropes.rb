@@ -1,5 +1,5 @@
 require "ropes/version"
-require "ropes/repository"
+require "ropes/repository/debian"
 
 module Ropes
   
