@@ -25,4 +25,5 @@ Gem::Specification.new do |spec|
   spec.add_dependency "gpgme"
   spec.add_dependency "arr-pm"
   spec.add_dependency "nokogiri"
+  spec.add_dependency "uuid"
 end
