@@ -14,7 +14,7 @@ It will generate the following files:
 
 ## Current status
 
-As of 0.0.1, it generates only `Releases`, `Releases.gpg`, `Packages` and `Packages.gz`.
+As of 0.2.1, it generates only `Releases`, `Releases.gpg`, `Packages` and `Packages.gz`.
 This is enough to get a basic Ubuntu repository working. There is no yum support.
 
 ## Installation
